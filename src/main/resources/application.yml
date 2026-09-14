@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: proleague-model
+  # Boot 4 moved the connection settings from spring.data.mongodb to spring.mongodb. The old
+  # key still binds but no longer drives the connection, so leaving it there silently sent
+  # every round to spring.mongodb.uri's own default of mongodb://localhost/test.
+  mongodb:
+    uri: ${MONGO_URI:mongodb://localhost:27017/proleague}
+
+server:
+  port: 8080
+  # Cookies are scoped to a host, not a port, so anything on localhost:8080 is handed the
+  # cookies every other app on localhost has ever set. That overruns Tomcat's 8KB default and
+  # the request fails as "Request header is too large" before it ever reaches a controller.
+  max-http-request-header-size: 64KB
+
+model:
+  # The sheet's 2.1, previously tuned down "aangepast voor iets minder goals".
+  form-goal-scale: 2.1
+  # "teveel goals: cap op 5 per ploeg"
+  goal-cap: 5.0
+  # "grens 1.16" - below this the bet is not worth placing. Every market, double chance included.
+  min-odds: 1.16
+  # The double chance's old floor, kept on as a value marker: it covers two of the three
+  # results, so one still paying this much is the book rating the favourite well below the model.
+  double-chance-value-odds: 1.4
+  # One per league position, best first.
+  #
+  # The sheet had sixteen of these for a sixteen-team league. Read as offsets from 1.00 they
+  # were a symmetric ladder about rank 8: +-0.01 either side of the middle, then -0.05 a step
+  # outward (0.06, 0.11, 0.16 ...), with only the old 0.64 hanging an extra step off the bottom.
+  #
+  # Rebuilt here on the same ladder for eighteen teams. An even table has no middle rank, so the
+  # centre falls between 9 and 10 and every mirrored pair - (1,18), (2,17) ... (9,10) - sums to
+  # 2.00, which puts the mean back on 1.00 exactly. Keeping the 0.05 step means the ladder grows
+  # outward instead of compressing, so the ends now reach 1.41 and 0.59 where the sixteen-team
+  # sheet stopped at 1.31 and 0.64. Every position is therefore worth slightly more or less than
+  # it used to be, not just the two new ones: the step is what was tuned, the endpoints follow.
+  rank-multipliers:
+    - 1.41
+    - 1.36
+    - 1.31
+    - 1.26
+    - 1.21
+    - 1.16
+    - 1.11
+    - 1.06
+    - 1.01
+    - 0.99
+    - 0.94
+    - 0.89
+    - 0.84
+    - 0.79
+    - 0.74
+    - 0.69
+    - 0.64
+    - 0.59
+
+sofascore:
+  base-url: ${SOFASCORE_URL:https://api.sofascore.com/api/v1}
+  # The unique-tournament id behind sofascore.com/.../pro-league/38. No key, no quota.
+  tournament: ${SOFASCORE_TOURNAMENT:38}
+  # SofaScore's season id, not the calendar year. 96616 is 2026/27, 77040 is 2025/26;
+  # /unique-tournament/38/seasons lists them all.
+  season: ${SOFASCORE_SEASON:96616}
+
+logging:
+  level:
+    be.proleague.model: INFO

@@ -1,0 +1,327 @@
+:root {
+  color-scheme: dark;
+  --bg: #14161a;
+  --panel: #1c1f26;
+  --line: #2c313b;
+  --text: #e7e9ee;
+  --muted: #8b93a3;
+  --up: #4ec97a;
+  --down: #e2635f;
+  /* Neither up nor down: it marks a price, not an outcome. */
+  --accent: #e0b055;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, sans-serif;
+}
+
+main {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0 auto 0 0;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 32px 0 8px;
+}
+
+h2 small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+input {
+  width: 60px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  padding: 7px 14px;
+  background: #3a6df0;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Each tab carries its own controls, so they sit in the same row under the tab strip. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* A row with nothing but a button lands it over the table's right edge, where it reads as the
+   table's own control rather than as a heading for it. */
+.actions.right {
+  justify-content: flex-end;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+button.tab {
+  padding: 8px 14px;
+  background: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 6px 6px 0 0;
+  color: var(--muted);
+}
+
+button.tab.active {
+  border-bottom-color: #3a6df0;
+  color: var(--text);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Deliberately allowed to wrap. Holding every cell on one line made the round table wider than
+   the page, so it hung off the right edge with all the whitespace on the left -- and a speeldag
+   with no bets in it, having nothing to be wide about, sat at a different width from one that
+   had. Names still hold their line: .side keeps its own nowrap. */
+th,
+td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Every column here holds the same thing, one profit figure, so none of them should look
+   weightier than the rest. Auto layout sizes on the header text, which was quietly giving
+   "dubbele kans" and "value bet" more room than "over" for no reason but their spelling. */
+table.even {
+  table-layout: fixed;
+}
+
+/* Everything but a name is a figure, and reads better centred under its header. */
+.name {
+  text-align: left;
+}
+
+thead th,
+tfoot th {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+tfoot th {
+  color: var(--text);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.up {
+  color: var(--up);
+}
+
+.down {
+  color: var(--down);
+}
+
+/* Home, separator and away are three real cells, so the table sizes them as columns: every
+   crest and every dash lands on the same x down the whole round. A grid inside one cell
+   cannot do that, because each row would size its own tracks. */
+/* Whatever width the table has spare goes to the separator, so the two name columns stay as
+   wide as their longest name: home names all start at the left edge, away names all end at
+   the right one, and nothing drifts centre. */
+.vs {
+  color: var(--muted);
+  width: 100%;
+}
+
+.away {
+  text-align: right;
+}
+
+/* Mirrored, so each crest sits on its own side's outer edge. */
+.away .side {
+  flex-direction: row-reverse;
+}
+
+.side {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Crests are not all square; contain keeps the odd one from stretching. */
+.crest {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.form {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.pill {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--bg);
+}
+
+.pill.W {
+  background: var(--up);
+}
+
+.pill.L {
+  background: var(--down);
+}
+
+.pill.D {
+  background: var(--text);
+}
+
+/* A pick and its price are one thing to read, so they never break across two lines. The room
+   for that came from the padding and the odds box below; a header may still wrap if the table
+   is ever squeezed harder than that, which is what keeps it from running off the page. */
+.bet {
+  white-space: nowrap;
+}
+
+/* Struck through means not staked. It comes first so a settled won/lost still colours it. */
+.skipped {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.won {
+  color: var(--up);
+}
+
+.lost {
+  color: var(--down);
+}
+
+/* Its own colour, not the bet's: a value bet is worth spotting whether it won, lost or is
+   still running, so the diamond keeps its accent where the pick around it turns green or red. */
+.value {
+  color: var(--accent);
+  font-style: normal;
+  font-size: 11px;
+  vertical-align: 2px;
+  /* The odd it trails is an input with its own padding, so it needs a hair of its own. */
+  margin-left: 1px;
+  text-decoration: none;
+}
+
+/* An odd reads as part of the sentence until it is hovered or focused, so a table of them is
+   still a table and not a form. It inherits the won/lost/skipped colour of the bet it sits in. */
+input.odd {
+  width: 3em;
+  /* Left, so whatever slack the box has falls after the price rather than between it and the @.
+     Centring only made sense while the box was fixed and much wider than what it held. */
+  text-align: left;
+  padding: 1px 3px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: inherit;
+}
+
+input.odd:hover,
+input.odd:focus {
+  background: var(--bg);
+  border-color: var(--line);
+  outline: none;
+  text-decoration: none;
+}
+
+/* A hand-typed odd is underlined, so it is clear at a glance which prices are not the provider's. */
+input.odd.edited {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+/* A fixed box has to be wide enough for the longest price, which leaves a short one floating in
+   the middle of it with a gap after the @. Where the browser can size the field to its own
+   content it does, and nothing but the input's padding sits between the @ and the number. */
+@supports (field-sizing: content) {
+  input.odd {
+    field-sizing: content;
+    width: auto;
+    /* Small enough that a three character price fills it, so there is no slack left to show. */
+    min-width: 1.5em;
+  }
+}
+
+/* Spinners would eat the width and invite click-stepping through prices one cent at a time. */
+input.odd::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+.error {
+  padding: 10px 12px;
+  margin-top: 16px;
+  background: #3a1f21;
+  border: 1px solid var(--down);
+  border-radius: 6px;
+}
+
+.empty {
+  color: var(--muted);
+  margin-top: 32px;
+}
