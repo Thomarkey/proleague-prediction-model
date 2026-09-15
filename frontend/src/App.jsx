@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import {useCallback, useEffect, useState} from 'react'
 
 const MARKETS = ['1X2', 'over', 'onder', 'btts', 'dubbele kans']
 // The value bets are not a market but a cut across one, so they only get a column where the
@@ -161,14 +161,20 @@ function Crest({ teamId, name }) {
   return <img className="crest" src={crest(teamId)} alt="" title={name} loading="lazy" />
 }
 
+function status(round) {
+  if (!round.predicted) return 'nog niet voorspeld'
+  if (round.settled) return 'afgerekend'
+  if (round.matches.every((match) => new Date(match.kickoff).getTime() > Date.now())) {
+    return 'nog niet gestart'
+  }
+  return 'loopt nog'
+}
+
 function RoundTable({ round, onOdds }) {
   return (
     <section>
       <h2>
-        Speeldag {round.number}{' '}
-        <small>
-          {!round.predicted ? ' niet voorspeld' : round.settled ? ' afgerekend' : ' loopt nog'}
-        </small>
+        Speeldag {round.number} <small>{status(round)}</small>
       </h2>
       <table>
         <thead>
