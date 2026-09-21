@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
- * The model's tuning knobs. These are not constants: the goal scale and both odds floors
+ * The model's tuning knobs. These are not constants: the goal scale and the odds bounds
  * were arrived at by watching the model run, and will be adjusted again.
  */
 @ConfigurationProperties(prefix = "model")
@@ -14,7 +14,8 @@ data class ModelProperties(
     val formGoalScale: Double,
     val goalCap: Double,
     val minOdds: Double,
-    /** Not a floor: the bar above which a double chance is flagged as a value bet. */
+    val maxOdds: Double,
+    /** Not a bound: the bar above which a double chance is flagged as a value bet. */
     val doubleChanceValueOdds: Double,
     val rankMultipliers: List<Double>,
 ) {

@@ -1,13 +1,6 @@
 package be.proleague.model.application
 
-import be.proleague.model.domain.Fixture
-import be.proleague.model.domain.Form
-import be.proleague.model.domain.GoalModel
-import be.proleague.model.domain.Market
-import be.proleague.model.domain.MatchPrediction
-import be.proleague.model.domain.Round
-import be.proleague.model.domain.Standings
-import be.proleague.model.domain.Team
+import be.proleague.model.domain.*
 import be.proleague.model.port.FootballDataPort
 import be.proleague.model.port.RoundRepositoryPort
 import org.slf4j.LoggerFactory
@@ -53,9 +46,9 @@ class PredictionService(
     private val log = LoggerFactory.getLogger(javaClass)
 
     /**
-     * A stored round, judged against the odds floor as it stands today rather than as it stood
-     * the day the round was written. Every read goes through here, because a round that has
-     * kicked off is never predicted again and this is its only chance to hear that a floor moved.
+     * A stored round, judged against the odds bounds as they stand today rather than as they
+     * stood the day the round was written. Every read goes through here, because a round that has
+     * kicked off is never predicted again and this is its only chance to hear that a bound moved.
      */
     fun round(season: Int, roundNumber: Int): Round? =
         roundRepository.find(season, roundNumber)?.let { betSelection.restate(it) }

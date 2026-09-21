@@ -130,6 +130,7 @@ Tuning knobs, not constants. All in `application.yml`:
 | `model.form-goal-scale` | 2.1 | Home-leg form scale, tuned down previously |
 | `model.goal-cap` | 5.0 | Per-team cap on predicted goals |
 | `model.min-odds` | 1.16 | Below this, the bet is not worth placing |
+| `model.max-odds` | 5.5 | Above this, the model is not trusted to call it |
 | `model.min-double-chance-odds` | 1.4 | Stricter floor for double chance |
 | `model.rank-multipliers` | 1.31 … 0.64 | 16 values, indexed by rank |
 

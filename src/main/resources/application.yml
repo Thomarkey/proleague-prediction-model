@@ -21,6 +21,7 @@ model:
   goal-cap: 5.0
   # "grens 1.16" - below this the bet is not worth placing. Every market, double chance included.
   min-odds: 1.16
+  max-odds: 5.5
   # The double chance's old floor, kept on as a value marker: it covers two of the three
   # results, so one still paying this much is the book rating the favourite well below the model.
   double-chance-value-odds: 1.4

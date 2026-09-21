@@ -1,16 +1,6 @@
 package be.proleague.model.application
 
-import be.proleague.model.domain.BttsPick
-import be.proleague.model.domain.DoubleChancePick
-import be.proleague.model.domain.FixtureOdds
-import be.proleague.model.domain.Market
-import be.proleague.model.domain.MatchResultPick
-import be.proleague.model.domain.OverPick
-import be.proleague.model.domain.Pick
-import be.proleague.model.domain.Prediction
-import be.proleague.model.domain.Round
-import be.proleague.model.domain.Selection
-import be.proleague.model.domain.UnderPick
+import be.proleague.model.domain.*
 import org.springframework.stereotype.Service
 
 /**
@@ -21,9 +11,10 @@ import org.springframework.stereotype.Service
  * lands exactly on it. The double chance is the one pick taken from the goals before they
  * are rounded, so a predicted draw still backs the side the model leans to.
  *
- * A bet is placed only when its odds clear the odds floor: below that it is not worth the
- * stake. Every market answers to the same floor; the double chance's own, higher bar is now
- * only a value marker, not a gate.
+ * A bet is placed only when its odds sit between the floor and the ceiling: below the floor
+ * it is not worth the stake, above the ceiling the model is not trusted that far out. Every
+ * market answers to the same bounds; the double chance's own, higher bar is now only a value
+ * marker, not a gate.
  */
 @Service
 class BetSelectionService(private val properties: ModelProperties) {
@@ -39,19 +30,19 @@ class BetSelectionService(private val properties: ModelProperties) {
         )
     }
 
-    /** The same pick at a hand-typed price, restaked against the same floor as any other. */
+    /** The same pick at a hand-typed price, restaked against the same bounds as any other. */
     fun restake(prediction: Prediction, pick: Pick, odds: Double): Selection =
         selection(prediction, pick, odds, edited = true)
 
     /**
-     * A stored round re-judged against today's floor.
+     * A stored round re-judged against today's odds bounds.
      *
      * Whether a bet was placed does not belong in the store the way the pick and the price do:
      * it is this calculation, and it was only ever frozen because the answer got written down
-     * next to its inputs. A round that has kicked off is never predicted again - [keepBook]
-     * hands back exactly what was stored - so without this, the floor of the day a round was
-     * written under is the floor it keeps for good, and lowering one cannot reach the rounds
-     * it already skipped. Re-running it on read is what makes a floor a setting.
+     * next to its inputs. A round that has kicked off is never predicted again -
+     * hands back exactly what was stored - so without this, the bounds of the day a round was
+     * written under are the bounds it keeps for good, and widening them cannot reach the rounds
+     * it already skipped. Re-running it on read is what makes a bound a setting.
      */
     fun restate(round: Round): Round = round.copy(
         matches = round.matches.map { match ->
@@ -69,7 +60,7 @@ class BetSelectionService(private val properties: ModelProperties) {
     private fun selection(prediction: Prediction, pick: Pick, odds: Double?, edited: Boolean) = Selection(
         pick = pick,
         odds = odds,
-        placed = odds != null && odds >= properties.minOdds,
+        placed = odds != null && odds >= properties.minOdds && odds <= properties.maxOdds,
         edited = edited,
         valueBet = odds != null && isValue(prediction, pick, odds),
     )
@@ -78,7 +69,7 @@ class BetSelectionService(private val properties: ModelProperties) {
      * A double chance is priced short by construction - it covers two of the three results -
      * so one still paying [ModelProperties.doubleChanceValueOdds] is the book rating the
      * favoured side well below what the model makes it. That is worth pointing at, but it is
-     * a marker only: the bet is placed on the same floor as every other market.
+     * a marker only: the bet is placed on the same bounds as every other market.
      *
      * Only when the model itself backs a side. A predicted draw gives the double chance no
      * favourite to be underrating: the pick then falls out of the goals before rounding and
