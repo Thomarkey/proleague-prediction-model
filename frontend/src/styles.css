@@ -296,6 +296,10 @@ input.odd.edited {
   text-underline-offset: 3px;
 }
 
+.skipped input.odd.edited {
+  text-decoration: line-through underline dotted;
+}
+
 /* A fixed box has to be wide enough for the longest price, which leaves a short one floating in
    the middle of it with a gap after the @. Where the browser can size the field to its own
    content it does, and nothing but the input's padding sits between the @ and the number. */
