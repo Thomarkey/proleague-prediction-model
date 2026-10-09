@@ -133,7 +133,7 @@ class PredictionService(
             ?.let { throw IncompleteStandingsException(it) }
 
         val forms = fixtures.flatMapTo(mutableSetOf()) { setOf(it.home.id, it.away.id) }
-            .associateWith { footballData.recentForm(season, it) }
+            .associateWith { footballData.recentForm(season, it).total }
         return fixtures.map { predict(it, standings, forms, existing?.match(it.id)) }
     }
 

@@ -8,10 +8,12 @@ const TABS = ['Speeldag', 'Klassement', 'Tracking']
 const FORM_LABELS = { W: 'gewonnen', D: 'gelijk', L: 'verloren' }
 // Each key is a column set on a standings record, so the table renders one the same as another.
 const VIEWS = [
-  { key: 'total', label: 'Totaal' },
-  { key: 'home', label: 'Thuis' },
-  { key: 'away', label: 'Uit' },
+  { key: 'total', label: 'Totaal', matches: 'wedstrijden' },
+  { key: 'home', label: 'Thuis', matches: 'thuiswedstrijden' },
+  { key: 'away', label: 'Uit', matches: 'uitwedstrijden' },
 ]
+// Matches Form.KEPT_MATCHES on the backend.
+const FORM_LENGTH = 5
 // Served CORS-open straight off the provider's CDN, so no crest is fetched or stored here.
 const crest = (teamId) => `https://img.sofascore.com/api/v1/team/${teamId}/image`
 
@@ -348,12 +350,15 @@ function Totals({ rounds }) {
   )
 }
 
-/** Oldest first, so the rightmost pill is the most recent match. */
+/**
+ * Oldest first, so the rightmost pill is the most recent match. Always [FORM_LENGTH] pills:
+ * the ones not yet played stay blank on the left, keeping every strip aligned.
+ */
 function FormStrip({ code }) {
-  if (!code) return <span className="muted">—</span>
+  const outcomes = [...code.padStart(FORM_LENGTH, ' ')]
   return (
     <span className="form">
-      {[...code].map((outcome, index) => (
+      {outcomes.map((outcome, index) => (
         <i key={index} className={`pill ${outcome}`} title={FORM_LABELS[outcome]}>
           {outcome}
         </i>
@@ -405,7 +410,7 @@ function StandingsTable({ standings }) {
             <th title="doelpunten tegen">DT</th>
             <th title="doelsaldo">DS</th>
             <th title="punten">PT</th>
-            <th title="laatste 5 wedstrijden, oudste eerst">Vorm</th>
+            <th title={`laatste ${FORM_LENGTH} ${view.matches}, oudste eerst`}>Vorm</th>
           </tr>
         </thead>
         <tbody>
@@ -433,7 +438,7 @@ function StandingsTable({ standings }) {
                 <strong>{record[view.key].points}</strong>
               </td>
               <td>
-                <FormStrip code={record.form} />
+                <FormStrip code={record[view.key].form} />
               </td>
             </tr>
           ))}

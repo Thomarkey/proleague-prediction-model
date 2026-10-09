@@ -1,14 +1,7 @@
 package be.proleague.model.adapter.sofascore
 
 import be.proleague.model.application.ModelProperties
-import be.proleague.model.domain.Fixture
-import be.proleague.model.domain.FixtureOdds
-import be.proleague.model.domain.Form
-import be.proleague.model.domain.MatchOutcome
-import be.proleague.model.domain.Scoreline
-import be.proleague.model.domain.Standings
-import be.proleague.model.domain.Team
-import be.proleague.model.domain.TeamRecord
+import be.proleague.model.domain.*
 import be.proleague.model.port.FootballDataPort
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -133,15 +126,23 @@ class SofaScoreAdapter(
 
     /**
      * The per-team feed spans every competition the team plays, so it is filtered back to this
-     * season's league matches: a cup tie must not count towards league form.
+     * season's league matches: a cup tie must not count towards league form. One call serves
+     * all three strips; the venue ones are just the same matches split by side.
      */
-    override fun recentForm(season: Int, teamId: Int): Form = Form.from(
-        get<EventsResponse>("/team/{id}/events/last/0", teamId)
+    override fun recentForm(season: Int, teamId: Int): TeamForm {
+        val matches = get<EventsResponse>("/team/{id}/events/last/0", teamId)
             .events
             .filter { it.season?.id == season && it.status.isFinished() }
             .sortedBy { it.startTimestamp }
-            .mapNotNull { it.outcomeFor(teamId) }
-    )
+        val (home, away) = matches.partition { it.homeTeam.id == teamId }
+        return TeamForm(
+            total = matches.formFor(teamId),
+            home = home.formFor(teamId),
+            away = away.formFor(teamId),
+        )
+    }
+
+    private fun List<SofaEvent>.formFor(teamId: Int): Form = Form.from(mapNotNull { it.outcomeFor(teamId) })
 
     private fun SofaEvent.outcomeFor(teamId: Int): MatchOutcome? {
         val score = scoreline() ?: return null

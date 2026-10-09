@@ -42,8 +42,11 @@ data class Form(val results: List<MatchOutcome>) {
         fun none() = Form(emptyList())
 
         fun from(results: List<MatchOutcome>) = Form(results.takeLast(KEPT_MATCHES))
-
-        /** Parses the spreadsheet notation, e.g. "WDW", oldest first. */
-        fun parse(codes: String) = from(codes.map { MatchOutcome.from(it) })
     }
 }
+
+/**
+ * A team's form over all its league matches and over each venue alone. The model scores
+ * [total]; [home] and [away] are only for the league table's split views.
+ */
+data class TeamForm(val total: Form, val home: Form, val away: Form)

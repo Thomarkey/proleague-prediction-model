@@ -222,6 +222,12 @@ tbody tr:last-child td {
   color: var(--bg);
 }
 
+/* A match not yet played: an empty slot, so a short strip keeps its width. */
+.pill:not(.W, .D, .L) {
+  border: 1px solid var(--line);
+  box-sizing: border-box;
+}
+
 .pill.W {
   background: var(--up);
 }

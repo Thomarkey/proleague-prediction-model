@@ -35,6 +35,10 @@ data class TeamRecord(
     val points: Int = 0,
     /** Recent results for the table's form strip. Same default reason as the columns above. */
     val form: Form = Form.none(),
+    /** The same strip over home matches only, for the home table. */
+    val homeForm: Form = Form.none(),
+    /** The same strip over away matches only, for the away table. */
+    val awayForm: Form = Form.none(),
 ) {
     val played: Int get() = homePlayed + awayPlayed
 

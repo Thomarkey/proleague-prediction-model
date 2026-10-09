@@ -1,12 +1,6 @@
 package be.proleague.model.presentation
 
-import be.proleague.model.domain.Fixture
-import be.proleague.model.domain.Market
-import be.proleague.model.domain.MatchPrediction
-import be.proleague.model.domain.Round
-import be.proleague.model.domain.Selection
-import be.proleague.model.domain.Standings
-import be.proleague.model.domain.TeamRecord
+import be.proleague.model.domain.*
 import java.time.Instant
 import kotlin.math.round
 
@@ -164,6 +158,8 @@ data class TableColumnsDto(
     val goalsAgainst: Int,
     val goalDifference: Int,
     val points: Int,
+    /** Recent results oldest first, e.g. "LWDWW", over this table's matches only. Empty until the next refresh fills it in. */
+    val form: String,
 )
 
 data class TeamRecordDto(
@@ -175,8 +171,6 @@ data class TeamRecordDto(
     val total: TableColumnsDto,
     val home: TableColumnsDto,
     val away: TableColumnsDto,
-    /** Recent results oldest first, e.g. "LWDWW". Empty until the next refresh fills it in. */
-    val form: String,
     val multiplier: Double,
     val xgHomeFor: Double,
     val xgHomeAgainst: Double,
@@ -197,6 +191,7 @@ data class TeamRecordDto(
                 goalsAgainst = record.goalsAgainst,
                 goalDifference = record.goalDifference,
                 points = record.points,
+                form = record.form.code(),
             ),
             home = TableColumnsDto(
                 played = record.homePlayed,
@@ -207,6 +202,7 @@ data class TeamRecordDto(
                 goalsAgainst = record.homeGoalsAgainst,
                 goalDifference = record.homeGoalDifference,
                 points = record.homePoints,
+                form = record.homeForm.code(),
             ),
             away = TableColumnsDto(
                 played = record.awayPlayed,
@@ -217,8 +213,8 @@ data class TeamRecordDto(
                 goalsAgainst = record.awayGoalsAgainst,
                 goalDifference = record.awayGoalDifference,
                 points = record.awayPoints,
+                form = record.awayForm.code(),
             ),
-            form = record.form.code(),
             multiplier = record.multiplier.round2(),
             xgHomeFor = record.xgHomeFor().round2(),
             xgHomeAgainst = record.xgHomeAgainst().round2(),

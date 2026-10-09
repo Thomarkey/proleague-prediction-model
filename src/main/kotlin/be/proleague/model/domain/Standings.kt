@@ -23,6 +23,11 @@ data class Standings(
     fun teamIds(): Set<Int> = records.map { it.team.id }.toSet()
 
     /** The provider serves form per team, so it is folded in once the table is built. */
-    fun withForm(forms: Map<Int, Form>): Standings =
-        copy(records = records.map { record -> record.copy(form = forms[record.team.id] ?: record.form) })
+    fun withForm(forms: Map<Int, TeamForm>): Standings = copy(
+        records = records.map { record ->
+            forms[record.team.id]
+                ?.let { record.copy(form = it.total, homeForm = it.home, awayForm = it.away) }
+                ?: record
+        },
+    )
 }
